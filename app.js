@@ -2,37 +2,69 @@ co(function*() {
 
   const baseUrl = `https://crossorigin.me/https://api-v2.soundcloud.com`;
 
+  let group, nodes, links, results, resizeTimeoutId;
 
-  function searchSongs(q) {
-    const url = `${baseUrl}/search/tracks?q=${q}&sc_a_id=b09fd3ab-0576-406d-b069-5edbd43bdf06&facet=genre&user_id=413791-622410-772944-424777&client_id=02gUJC0hH2ct1EGOcYXQIzRFU91c72Ea&limit=10&offset=0&linked_partitioning=1&app_version=1476820058`;
-    return fetch(url).then(n => n.json());
-  }
-
-
-  function getRelated(songId) {
-    const url = `${baseUrl}/tracks/${songId}/related?anon_user_id=13874249&client_id=02gUJC0hH2ct1EGOcYXQIzRFU91c72Ea&limit=10&offset=0&linked_partitioning=1&app_version=1476719521`;
-    return fetch(url).then(n => n.json());
-  }
+  let svg = qs('svg');
 
   Graph.render();
+  setSvgWidth();
 
-  let group = 1;
-  let nodes = [];
-  let links = [];
 
-  const results = yield searchSongs('techno');
+  document.body.addEventListener('submit', co.wrap(function* (e) {
+     e.preventDefault();
 
-  const source = results.collection[0];
-  nodes.push({
-    id: source.id,
-    image: source.artwork_url || source.user.avatar_url,
-    href: source.permalink_url,
-    group
+      const q = qs('input').value;
+
+      results = yield searchSongs(q);
+
+      qs('ul').innerHTML = results.collection.map((song, i) => `
+      
+      <li>
+        <a href="#" class="song-result" data-index="${i}">
+          ${song.title} ${song.tag_list}
+        </a>
+      </li>
+      
+    `).join('');
+
+  }));
+
+  document.body.addEventListener('click', e => {
+    if (e.target.classList.contains('song-result')) {
+      e.preventDefault();
+      const i = e.target.dataset.index;
+      const song = results.collection[i];
+      co(run, song).catch(toss);
+    }
   });
 
-  yield loadMore(source.id);
+  document.body.addEventListener('dblclick', e => {
+    const el = e.target;
+    if (e.target.classList.contains('song')) {
+      const id = el.children[0].textContent;
+      co(loadMore, +id);
+    }
+  });
+
+  window.onresize = queueSvgWidth;
 
 
+  function* run(source) {
+
+    group = 1;
+    nodes = [];
+    links = [];
+
+    nodes.push({
+      id: source.id,
+      image: source.artwork_url || source.user.avatar_url,
+      href: source.permalink_url,
+      group
+    });
+
+    yield loadMore(source.id);
+
+  }
 
   function* loadMore(id) {
 
@@ -84,13 +116,39 @@ co(function*() {
   function values(obj) {
     return Object.keys(obj || {}).map(key => obj[key]);
   }
+  
+  function qs(sel) {
+    return document.querySelector(sel);
+  }
+  
+  function qsa(sel) {
+    return document.querySelectorAll(sel);
+  }
 
-  document.body.addEventListener('dblclick', e => {
-    const el = e.target;
-    if (e.target.classList.contains('song')) {
-      const id = el.children[0].textContent;
-      co(loadMore, +id);
-    }
-  })
+  function toss(e) {
+    console.error(e);
+    throw e;
+  }
+
+  function queueSvgWidth() {
+    clearTimeout(resizeTimeoutId);
+    resizeTimeoutId = setTimeout(setSvgWidthsetWidth, 300);
+  }
+
+  function setSvgWidth() {
+    svg.setAttribute('width', window.outerWidth*.95);
+    svg.setAttribute('height', window.outerHeight*.95);
+  }
+
+  function searchSongs(q) {
+    const url = `${baseUrl}/search/tracks?q=${q}&sc_a_id=b09fd3ab-0576-406d-b069-5edbd43bdf06&facet=genre&user_id=413791-622410-772944-424777&client_id=02gUJC0hH2ct1EGOcYXQIzRFU91c72Ea&limit=10&offset=0&linked_partitioning=1&app_version=1476820058`;
+    return fetch(url).then(n => n.json());
+  }
+
+
+  function getRelated(songId) {
+    const url = `${baseUrl}/tracks/${songId}/related?anon_user_id=13874249&client_id=02gUJC0hH2ct1EGOcYXQIzRFU91c72Ea&limit=10&offset=0&linked_partitioning=1&app_version=1476719521`;
+    return fetch(url).then(n => n.json());
+  }
 
 }).catch(e => console.log(e));
