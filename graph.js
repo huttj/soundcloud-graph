@@ -3,7 +3,7 @@
   const dim = 25;
   const offset = dim / 2;
 
-  let svg, color, simulation, node, link;
+  let svg, color, simulation, node, link, g, width, height;
 
   window.Graph = {
     loadData,
@@ -11,18 +11,42 @@
   };
 
   function render() {
-    svg = d3.select("svg"),
-      width = +svg.attr("width"),
-      height = +svg.attr("height");
+    svg    = d3.select("svg");
+    width  = +svg.attr("width");
+    height = +svg.attr("height");
 
     color = d3.scaleOrdinal(d3.schemeCategory20);
 
+    svg.call(d3.zoom().scaleExtent([1 / 2, 8]).on("zoom", zoomed))
+      .on('dblclick.zoom', null);
+
     simulation = d3.forceSimulation()
       // .force("link", d3.forceLink().id(d => d.id))
-      .force("link", d3.forceLink().distance(()=>dim*2))
-      .force("charge", d3.forceManyBody(d => -dim*10000))
+      // .force("link", d3.forceLink().distance(()=>dim*2))
+      // .force("charge", d3.forceManyBody(d => -dim*10000))
+      // .force("center", d3.forceCenter(width / 2, height / 2))
+
+      .force("link", d3.forceLink().id(d => d.id))
+      .force("charge", d3.forceManyBody().strength(-300))
       .force("center", d3.forceCenter(width / 2, height / 2))
+
+      // .force('charge', d3.forceManyBody()
+      //   .strength(-500)
+      // )
+      // .force('link', d3.forceLink()
+      //   .id(d => d.id)
+      //   .distance(50)
+      //   .strength(strength)
+      // )
+      .force('x', d3.forceX())
+      .force('y', d3.forceY())
+
       .on("tick", ticked);
+  }
+
+  function zoomed() {
+    link.attr('transform', d3.event.transform);
+    node.attr('transform', d3.event.transform);
   }
 
   function strength(link) {
@@ -85,7 +109,7 @@
       .text(d => d.id);
 
     simulation.nodes(nodes);
-    simulation.force("link").links(links);
+    simulation.force('link').links(links);
 
   }
 
