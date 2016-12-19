@@ -1,6 +1,6 @@
 co(function*() {
 
-  const baseUrl = `https://crossorigin.me/https://api-v2.soundcloud.com`;
+  const baseUrl = `http://localhost:5000/https://api-v2.soundcloud.com`;
 
   let group, nodes, links, results, resizeTimeoutId;
 
@@ -132,7 +132,7 @@ co(function*() {
 
   function queueSvgWidth() {
     clearTimeout(resizeTimeoutId);
-    resizeTimeoutId = setTimeout(setSvgWidthsetWidth, 300);
+    resizeTimeoutId = setTimeout(setSvgWidth, 300);
   }
 
   function setSvgWidth() {
@@ -141,13 +141,14 @@ co(function*() {
   }
 
   function searchSongs(q) {
-    const url = `${baseUrl}/search/tracks?q=${q}&sc_a_id=b09fd3ab-0576-406d-b069-5edbd43bdf06&facet=genre&user_id=413791-622410-772944-424777&client_id=02gUJC0hH2ct1EGOcYXQIzRFU91c72Ea&limit=10&offset=0&linked_partitioning=1&app_version=1476820058`;
+    // const url = `${baseUrl}/search/tracks?q=${q}&sc_a_id=b09fd3ab-0576-406d-b069-5edbd43bdf06&facet=genre&user_id=413791-622410-772944-424777&client_id=fDoItMDbsbZz8dY16ZzARCZmzgHBPotA&limit=10&offset=0&linked_partitioning=1&app_version=1476820058`;
+    const url = `${baseUrl}/search/tracks?q=${q}&sc_a_id=b09fd3ab-0576-406d-b069-5edbd43bdf06&facet=genre&user_id=264875-138197-544227-860883&client_id=fDoItMDbsbZz8dY16ZzARCZmzgHBPotA&limit=10&offset=0&linked_partitioning=1&app_version=1481937886`;
     return fetch(url).then(n => n.json());
   }
 
 
   function getRelated(songId) {
-    const url = `${baseUrl}/tracks/${songId}/related?anon_user_id=13874249&client_id=02gUJC0hH2ct1EGOcYXQIzRFU91c72Ea&limit=10&offset=0&linked_partitioning=1&app_version=1476719521`;
+    const url = `${baseUrl}/tracks/${songId}/related?anon_user_id=79622734&client_id=fDoItMDbsbZz8dY16ZzARCZmzgHBPotA&limit=10&offset=0&linked_partitioning=1&app_version=1481937886`;
     return fetch(url).then(n => n.json());
   }
 

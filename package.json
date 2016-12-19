@@ -1,0 +1,25 @@
+{
+  "name": "soundcloud",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "dependencies": {
+    "express": "^4.14.0",
+    "isomorphic-fetch": "^2.2.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/huttj/soundcloud-graph.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/huttj/soundcloud-graph/issues"
+  },
+  "homepage": "https://github.com/huttj/soundcloud-graph#readme"
+}
